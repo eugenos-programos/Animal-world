@@ -41,8 +41,6 @@ class Cell():
         return self.__raw_index
 
     def get_plant_on_cell(self) -> Plant:
-        if not self.__plant:
-            raise 'Plant does not exist in this cell'
         return self.__plant
     
     def delete_animal(self, animal : Animal) -> None:

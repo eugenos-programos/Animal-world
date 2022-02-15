@@ -6,7 +6,7 @@ from Animal import Animal
 from Predator import Predator
 from Sex import Sex
 
-class Animal(Predator):
+class Tiger(Predator):
     __max_food_points : int = 4 
 
     def __init__(self, sex : Sex, id_number : int = -1, animal_cannot_move : bool = False) -> None:
