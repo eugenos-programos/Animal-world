@@ -2,7 +2,10 @@ from Predator import Predator
 from Sex import Sex
 
 class Lion(Predator):
+    __max_food_points = 5
+
     def __init__(self, sex : Sex, id_number=-1, animal_cannot_move=False) -> None:
+        super().__init__()
         self.__animal_sex = sex
         self.__animal_id = id_number
         self.__cell_speed = 3
@@ -23,7 +26,5 @@ class Lion(Predator):
         return 'L-'
     
     def get_max_food_points(self):
-        return 5
+        return self.__max_food_points
 
-lion = Lion(Sex.MALE)
-assert lion.info() == 'L--1(mal,5,4)', 'Incorret'

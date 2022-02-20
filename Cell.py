@@ -6,20 +6,23 @@ class Cell():
     __column_index : int
     __raw_index : int
     __plant : Plant
-    __animals : list(Animal)
+    __animals : list[Animal]
 
     def __init__(self, raw_index : int, column_index : int,
-                plant_on_cell : Plant, animals : list(Animal)) -> None:
+                plant_on_cell : Plant, animals : list[Animal]) -> None:
+        if len(animals) > 4 or len(animals) == 4 and Plant:
+            raise "check input"
         self.__column_index = column_index
         self.__raw_index = raw_index
         self.__plant = plant_on_cell
         self.__animals = animals
     
     def add_animal_on_cell(self, animal : Animal) -> bool:
-        output = (len(self.__animals) == 3 and self.get_plant_on_cell()) \
+        cannot_add = (len(self.__animals) == 3 and self.get_plant_on_cell()) \
                                             or len(self.__animals) == 4
-        self.__animals.append(animal)
-        return output
+        if not cannot_add:
+            self.__animals.append(animal)
+        return cannot_add
 
     def is_animal_with_another_sex(self, animal : Animal) -> Animal:
         animal_type = type(animal)
@@ -48,16 +51,19 @@ class Cell():
             raise f"Animal {animal.info()} does not axist in this cell"
         self.__animals.remove(animal)
         
-    def info(self) -> list(str):
+    def info(self) -> list[str]:
         str_empty_place = "      -       "
-        string_describing_cell = [self.__plant] + self.__animals if not self.__plant is None \
-                                                                 else self.__animals
+        string_describing_cell = []
+        if self.get_plant_on_cell():
+            string_describing_cell.append(self.__plant.info())
+        for animal in self.__animals:
+            string_describing_cell.append(animal.info())
         string_describing_cell += [
             str_empty_place for index in range(4 - len(string_describing_cell))
         ]
         return string_describing_cell
 
-    def get_animals_in_cell(self) -> list(Animal):
+    def get_animals_in_cell(self) -> list[Animal]:
         return self.__animals
 
     def delete_plant_on_cell(self) -> None:
@@ -71,7 +77,8 @@ class Cell():
         animals_will_die_in_next_step = [
             animal for animal in self.__animals if not animal.next_step() 
         ]
-        map(animals_will_die_in_next_step, self.delete_animal())
+        for animal in animals_will_die_in_next_step:
+            self.delete_animal(animal)
 
     def add_plant_in_cell(self, plant_id=-1) -> None:
         if len(self.__animals) == 4 or self.__plant:

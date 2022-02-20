@@ -3,8 +3,8 @@ from Sex import Sex
 
 class Rabbit(Herbivore):
     __max_food_points : int = 3 
-
     def __init__(self, sex : Sex, id_number=-1, animal_cannot_move=False) -> None:
+        super().__init__(4, 4)
         self.__animal_sex = sex
         self.__animal_id = id_number
         self.__cell_speed = 1
@@ -13,7 +13,7 @@ class Rabbit(Herbivore):
         self.__animal_cannot_move = animal_cannot_move
     
     def info(self) -> str:
-        output = f'L-{self.__animal_id}('
+        output = f'R-{self.__animal_id}('
         if self.__animal_sex == Sex.FEMALE:
             output += 'fem,'
         else:
@@ -22,7 +22,7 @@ class Rabbit(Herbivore):
         return output
 
     def get_class_name(self) -> str:
-        return 'L-'
+        return 'R-'
     
     def get_max_food_points(self):
         return self.__max_food_points

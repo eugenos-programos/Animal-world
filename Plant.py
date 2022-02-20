@@ -23,7 +23,7 @@ class Plant():
         return can_live_in_next_step 
     
     def info(self) -> String:
-        info_string = 'P-' + str(self.__id) + '(' + str(self.__life_points) + ')\t'
+        info_string = 'P-' + str(self.__id) + '(' + str(self.__life_points) + ')'
         return info_string
     
     def it_is_new_plant(self, parameter : bool) -> bool:
