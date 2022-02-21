@@ -72,7 +72,7 @@ class Cell():
         self.__plant = None
     
     def next_step(self) -> None:
-        if(self.__plant and not self.__plant.next_step()):
+        if self.__plant and not self.__plant.next_step():
             self.delete_plant_on_cell()
         animals_will_die_in_next_step = [
             animal for animal in self.__animals if not animal.next_step() 
@@ -85,7 +85,7 @@ class Cell():
             raise 'There is no place for plant in cell'
 
     def inhabitant_numb(self) -> int:
-        is_plant_on_cell = int(self.__plant is None)
+        is_plant_on_cell = int(self.__plant is not None)
         return is_plant_on_cell + len(self.__animals)
 
 

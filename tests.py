@@ -89,7 +89,7 @@ class Test(unittest.TestCase):
         gratulations_message("herbivore and predator classes")
 
     def cell_tests(self) -> None:
-        print(Fore.WHITE + 'Cell class testing')
+        print(Fore.WHITE + 'Cell class testing', end='', flush=True)
         animals_for_cell = [
             Rabbit(Sex.MALE),
             Lion(Sex.MALE)
@@ -101,7 +101,7 @@ class Test(unittest.TestCase):
                     plant_on_cell=plant_on_cell,
                     animals=animals_for_cell.copy()
         )
-
+        pprint()
         animal_to_add = Zebra(Sex.FEMALE)
         cell.add_animal_on_cell(animal_to_add)
         self.assertListEqual(cell.get_animals_in_cell(),
@@ -113,6 +113,7 @@ class Test(unittest.TestCase):
         self.assertListEqual([cell.get_column_index(), cell.get_raw_index()],
                              [3, 2]
         )
+        pprint()
         self.assertEqual(cell.get_plant_on_cell(), plant_on_cell)
         correct_information = [
             'P--1(4)', 'R--1(mal,4,4)',
@@ -121,10 +122,21 @@ class Test(unittest.TestCase):
         self.assertEqual(correct_information, cell.info())
         cell.next_step()
         correct_information = [
-
+            'P--1(3)', 'R--1(mal,3,3)',
+            'L--1(mal,4,3)', 'Z--1(fem,3,3)'
         ]
-        print(cell.info())
-        self.assertEqual()
+        pprint()
+        self.assertEqual(correct_information, cell.info())
+        for iter in range(3):
+            cell.next_step()
+        correct_information = [
+            '      -       ', '      -       ',
+            '      -       ', '      -       '
+        ]
+        self.assertEqual(correct_information, cell.info())
+        self.assertEqual(cell.inhabitant_numb(), 0)
+        pprint()
+        gratulations_message("cell class")
 
 
 

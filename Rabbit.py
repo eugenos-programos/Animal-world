@@ -8,8 +8,6 @@ class Rabbit(Herbivore):
         self.__animal_sex = sex
         self.__animal_id = id_number
         self.__cell_speed = 1
-        self.__life_points = 4
-        self.__food_points = 4
         self.__animal_cannot_move = animal_cannot_move
     
     def info(self) -> str:
@@ -18,7 +16,7 @@ class Rabbit(Herbivore):
             output += 'fem,'
         else:
             output += 'mal,'
-        output += f'{self.__food_points},{self.__life_points})'
+        output += f'{self._Animal__food_points},{self._Animal__life_points})'
         return output
 
     def get_class_name(self) -> str:

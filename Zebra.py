@@ -5,11 +5,9 @@ from Herbivore import Herbivore
 
 class Zebra(Herbivore): #herbivore inheritance
     def __init__(self, sex_ : Sex, id_number = -1, animal_cannot_move = False) -> None:
-        super().__init__()
+        super().__init__(4, 4)
         self.__animal_sex = sex_
         self.__cell_speed = 2
-        self.__life_points = 4
-        self.__food_points = 4
         self.__animal_cannot_move = animal_cannot_move
         self.__animal_id = id_number
         self.__max_food_points = 4
@@ -18,8 +16,8 @@ class Zebra(Herbivore): #herbivore inheritance
         result_string = 'Z-' + str(self.__animal_id) + '('
         result_string = result_string + 'fem,' if self.__animal_sex == Sex.FEMALE \
             else result_string + 'mal,'
-        result_string += str(self.__food_points) + ',' +\
-                     str(self.__life_points) + ')' 
+        result_string += str(self._Animal__food_points) + ',' +\
+                     str(self._Animal__life_points) + ')' 
         return result_string
 
     @staticmethod

@@ -17,10 +17,10 @@ class Plant():
         return self.__life_points
     
     def next_step(self) -> bool:
-        can_live_in_next_step = self.__life_points == 1 or self.__life_points == 0
-        if can_live_in_next_step:
+        cannot_live_in_next_step = self.__life_points == 1 or self.__life_points == 0
+        if not cannot_live_in_next_step:
             self.__life_points -= 1
-        return can_live_in_next_step 
+        return not cannot_live_in_next_step 
     
     def info(self) -> String:
         info_string = 'P-' + str(self.__id) + '(' + str(self.__life_points) + ')'
