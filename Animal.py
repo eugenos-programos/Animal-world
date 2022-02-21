@@ -8,9 +8,11 @@ class Animal():
     __animal_sex : int
     __max_food_points : int
     __life_points : int
-    def __init__(self, food_points : int = -1, life_points : int = -1) -> None:
+    def __init__(self, food_points : int = -1, life_points : int = -1, cell_speed : int = -1, animal_cannot_move : bool = False) -> None:
         self.__food_points = food_points
         self.__life_points = life_points
+        self.__animal_cannot_move = animal_cannot_move
+        self.__cell_speed = cell_speed
 
     def get_cell_speed(self) -> int:
         return self.__cell_speed
@@ -20,6 +22,9 @@ class Animal():
 
     def set_animal_id(self, animal_id : int) -> None:
         self.__animal_id = animal_id
+
+    def get_cannot_animal_move(self) -> bool:
+        return self.__animal_cannot_move
 
     def set_cannot_animal_move(self, moving : bool) -> None:
         self.__animal_cannot_move = moving

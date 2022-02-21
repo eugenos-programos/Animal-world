@@ -1,8 +1,9 @@
 from curses import raw
 from curses.ascii import NUL
 from operator import ne
+from numpy import isin
 from scipy import rand
-from sqlalchemy import false, true
+from sqlalchemy import false, null, true
 from Sex import Sex
 from Zebra import Zebra
 from Rabbit import Rabbit
@@ -17,14 +18,14 @@ class Area():
     __length : int
     __width : int
     __last_inhabitant_id : int
-    __area : list(list(Cell))
+    __area : list[list[Cell]]
     __inhabitant_log : str
 
     def __animal_moving(self) -> None:
         for cell_raw in self.__area:
             for cell in cell_raw:
                 for animal_in_cell in cell.get_animals_in_cell():
-                    if animal_in_cell.get_cannot_animal_propagate():   continue
+                    if animal_in_cell.get_cannot_animal_move():   continue
                     if animal_in_cell.get_life_points() == 1:
                         if not self.__find_partner(cell, animal_in_cell):   self.__find_eat(cell, animal_in_cell)
                     if animal_in_cell.get_food_points() <= 2:   self.__find_eat(cell, animal_in_cell)
@@ -79,7 +80,7 @@ class Area():
             self.__find_eat_for_predator(cell_with_animal, animal)
 
     def __find_partner(self, cell_with_animal : Cell, animal : Animal) -> bool:
-        if not animal.get_cannot_animal_propagate():
+        if not animal.get_cannot_animal_move():
             for index in range(1, animal.get_cell_speed() + 1):
                 for neighbor_cell in self.__get_neighbor_cells(cell_with_animal, index):
                     if neighbor_cell.find_animal_with_another_sex(animal):
@@ -91,7 +92,7 @@ class Area():
                         return True
         return False
 
-    def __get_neighbor_cells(self, cell : Cell, scope_level : int) -> list(Cell):
+    def __get_neighbor_cells(self, cell : Cell, scope_level : int) -> list[Cell]:
         raw_index = cell.get_row_index()
         column_index = cell.get_column_index()
         result = []
@@ -179,7 +180,7 @@ class Area():
             for cell in cell_row:
                 cell.next_step()
 
-    def __get_random_neighbor_cell(neighbor_cells : list(Cell)) -> None:
+    def __get_random_neighbor_cell(neighbor_cells : list[Cell]) -> None:
         return neighbor_cells[random.randint(0, len(neighbor_cells) - 1)]
 
     def __all_animal_can_propagate(self) -> None:
@@ -228,10 +229,17 @@ class Area():
     def increase_last_inh_id(self) -> None:
         self.__last_inhabitant_id += 1
 
-    def __init__(self, area : list(list(Cell)), length : int, width : int) -> None:
+    def __init__(self, area : list[list[Cell]]) -> None:
+        
         self.__area = area
-        self.__length = length
-        self.__width = width
+        self.__length = len(area)
+        self.__width = len(area[0])
+        self.__inhabitant_log = ""
+        for area_row in area:
+            if isinstance(area_row, Cell):
+                raise "Lengt and width values should be more than 2"
+            if len(area_row) != self.__width:
+                raise "Area should be rectangular size"
         inhabitant_id = 0
         for area_row in area:
             for cell in area_row:
@@ -251,6 +259,7 @@ class Area():
                 for column_index in range(self.__width):
                     str_temp += self.__area[raw_index][column_index].info()[str_index] + '\t'
                 matrix_form.append(str_temp)
+        return matrix_form
 
     def display_area(self) -> None:
         for raw_index in range(self.__length):

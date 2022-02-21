@@ -1,6 +1,5 @@
 from Animal import Animal
 from Plant import Plant
-import unittest
 
 class Cell():
     __column_index : int
@@ -9,7 +8,7 @@ class Cell():
     __animals : list[Animal]
 
     def __init__(self, raw_index : int, column_index : int,
-                plant_on_cell : Plant, animals : list[Animal]) -> None:
+                plant_on_cell : Plant = None, animals : list[Animal] = []) -> None:
         if len(animals) > 4 or len(animals) == 4 and Plant:
             raise "check input"
         self.__column_index = column_index
@@ -55,8 +54,8 @@ class Cell():
         str_empty_place = "      -       "
         string_describing_cell = []
         if self.get_plant_on_cell():
-            string_describing_cell.append(self.__plant.info())
-        for animal in self.__animals:
+            string_describing_cell.append(self.__plant.info() + '      ')
+        for animal in self.__animals:   
             string_describing_cell.append(animal.info())
         string_describing_cell += [
             str_empty_place for index in range(4 - len(string_describing_cell))

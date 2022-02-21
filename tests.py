@@ -3,6 +3,7 @@ import unittest
 import time
 import random
 from colorama import Fore
+import numpy as np
 
 from sqlalchemy import true
 
@@ -15,6 +16,7 @@ from Tiger import Tiger
 from Lion import Lion
 from Cell import Cell
 from Plant import Plant
+from Area import Area
 
 def pprint() -> None:
     print('.', end='', flush=True)
@@ -116,13 +118,13 @@ class Test(unittest.TestCase):
         pprint()
         self.assertEqual(cell.get_plant_on_cell(), plant_on_cell)
         correct_information = [
-            'P--1(4)', 'R--1(mal,4,4)',
+            'P--1(4)      ', 'R--1(mal,4,4)',
             'L--1(mal,5,4)', 'Z--1(fem,4,4)'
         ]
         self.assertEqual(correct_information, cell.info())
         cell.next_step()
         correct_information = [
-            'P--1(3)', 'R--1(mal,3,3)',
+            'P--1(3)      ', 'R--1(mal,3,3)',
             'L--1(mal,4,3)', 'Z--1(fem,3,3)'
         ]
         pprint()
@@ -138,16 +140,34 @@ class Test(unittest.TestCase):
         pprint()
         gratulations_message("cell class")
 
-
-
-
-
+    def tests_for_area_class_1(self):
+        print(Fore.WHITE + "Area class testing ")
+        cell1 = Cell(0, 0, Plant(), [   ### id for animals will be set auto
+            Zebra(Sex.MALE),
+            Lion(Sex.FEMALE)
+        ])
+        cell2 = Cell(0, 1, animals=[
+            Rabbit(Sex.MALE),
+            Lion(Sex.FEMALE),
+            Rabbit(Sex.FEMALE)
+        ])
+        cell3 = Cell(1, 0, animals=[
+            Lion(Sex.FEMALE),
+            Rabbit(Sex.MALE)
+        ])
+        cell4 = Cell(1, 1)  ### empty cell
+        area = Area(area=[[cell1, cell2], [cell3, cell4]])
+        self.assertEqual(area.get_length(), 2)
+        self.assertEqual(area.get_width(), 2)
+        print(area.transform_area_into_matrix_form())
+        area.next_step()
 
 if __name__ == '__main__':
     test = Test()
     test.tests_for_animal_class()
     test.tests_for_herbivore_and_predator_classes()
     test.cell_tests()
+    test.tests_for_area_class_1()
     
 
 
