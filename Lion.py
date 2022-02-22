@@ -2,18 +2,16 @@ from Predator import Predator
 from Sex import Sex
 
 class Lion(Predator):
-    __max_food_points = 5
 
-    def __init__(self, sex : Sex, id_number=-1, animal_cannot_move=False) -> None:
-        super().__init__(5, 4)
-        self.__animal_sex = sex
-        self.__animal_id = id_number
-        self.__cell_speed = 3
-        self.__animal_cannot_move = animal_cannot_move
-    
+    def __init__(self, sex : Sex, id_number : int = -1, animal_cannot_move : bool = False) -> None:
+        super().__init__(food_points=5, life_points=4, cell_speed=3,
+         animal_id=id_number, animal_cannot_move=animal_cannot_move,
+         sex=sex, max_food_points=5
+        )
+
     def info(self) -> str:
-        output = f'L-{self.__animal_id}('
-        if self.__animal_sex == Sex.FEMALE:
+        output = f'L-{self._Animal__animal_id}('
+        if self._Animal__animal_sex == Sex.FEMALE:
             output += 'fem,'
         else:
             output += 'mal,'
@@ -22,7 +20,4 @@ class Lion(Predator):
 
     def get_class_name(self) -> str:
         return 'L-'
-    
-    def get_max_food_points(self):
-        return self.__max_food_points
 

@@ -1,18 +1,27 @@
 import typing
+from Sex import Sex
 
 class Animal():
     __cell_speed : int
     __animal_id : int
     __animal_cannot_move : bool
     __food_points : int
-    __animal_sex : int
+    __animal_sex : Sex
     __max_food_points : int
     __life_points : int
-    def __init__(self, food_points : int = -1, life_points : int = -1, cell_speed : int = -1, animal_cannot_move : bool = False) -> None:
+
+    def __init__(self, food_points : int, life_points : int,
+                cell_speed : int, animal_id : int, sex : Sex,
+                max_food_points : int,
+                animal_cannot_move : bool
+    ) -> None:
         self.__food_points = food_points
         self.__life_points = life_points
         self.__animal_cannot_move = animal_cannot_move
         self.__cell_speed = cell_speed
+        self.__animal_id = animal_id
+        self.__animal_sex = sex
+        self.__max_food_points = max_food_points
 
     def get_cell_speed(self) -> int:
         return self.__cell_speed

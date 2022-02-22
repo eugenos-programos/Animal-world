@@ -2,17 +2,16 @@ from Herbivore import Herbivore
 from Sex import Sex
 
 class Rabbit(Herbivore):
-    __max_food_points : int = 3 
-    def __init__(self, sex : Sex, id_number=-1, animal_cannot_move=False) -> None:
-        super().__init__(4, 4)
-        self.__animal_sex = sex
-        self.__animal_id = id_number
-        self.__cell_speed = 1
-        self.__animal_cannot_move = animal_cannot_move
+
+    def __init__(self, sex : Sex, id_number : int = -1, animal_cannot_move : bool = False) -> None:
+        super().__init__(food_points=4, life_points=4, cell_speed=3,
+                        animal_id=id_number, animal_cannot_move=animal_cannot_move,
+                        sex=sex, max_food_points=3
+        )
     
     def info(self) -> str:
-        output = f'R-{self.__animal_id}('
-        if self.__animal_sex == Sex.FEMALE:
+        output = f'R-{self._Animal__animal_id}('
+        if self._Animal__animal_sex == Sex.FEMALE:
             output += 'fem,'
         else:
             output += 'mal,'
@@ -23,4 +22,4 @@ class Rabbit(Herbivore):
         return 'R-'
     
     def get_max_food_points(self):
-        return self.__max_food_points
+        return self._Animal__max_food_points

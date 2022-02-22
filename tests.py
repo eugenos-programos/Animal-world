@@ -27,16 +27,7 @@ def gratulations_message(tests_name : str) -> None:
 
 class Test(unittest.TestCase):        
     def tests_for_animal_class(self) -> None:
-        animal_ex = Animal()
-
-        #initializing
-        animal_ex._Animal__max_food_points = 100
-        animal_ex._Animal__life_points = 34
-        animal_ex._Animal__animal_sex = Sex.FEMALE
-        animal_ex.set_food_points(6)
-        animal_ex.set_cannot_animal_move(True)
-        animal_ex.set_animal_id(234)
-        animal_ex._Animal__cell_speed = 2
+        animal_ex = Animal(6, 34, 2, 234, Sex.FEMALE, 100, True)
         print(Fore.WHITE + 'Animal class testing', end='', flush=True)
         pprint()
 
@@ -67,25 +58,25 @@ class Test(unittest.TestCase):
         self.assertEqual(rabbit.info(), "R--1(mal,4,4)")
         self.assertEqual(rabbit.get_class_name(), 'R-')
         self.assertEqual(rabbit.get_max_food_points(), 3)
-        self.assertEqual(rabbit._Rabbit__animal_cannot_move, False)
-        self.assertEqual(rabbit._Rabbit__cell_speed, 1)
+        self.assertEqual(rabbit._Animal__animal_cannot_move, False)
+        self.assertEqual(rabbit._Animal__cell_speed, 3)
         pprint()
 
         tiger = Tiger(sex=Sex.FEMALE, id_number=100)
-        self.assertEqual(tiger._Tiger__max_food_points, 4)
+        self.assertEqual(tiger._Animal__max_food_points, 4)
         self.assertEqual(tiger.info(), "T-100(fem,4,4)")
         self.assertEqual(tiger.get_class_name(), "T-")
         self.assertEqual(tiger.get_max_food_points(), 4)
-        self.assertEqual(tiger._Tiger__animal_cannot_move, False)
-        self.assertEqual(tiger._Tiger__cell_speed, 2)
+        self.assertEqual(tiger._Animal__animal_cannot_move, False)
+        self.assertEqual(tiger._Animal__cell_speed, 2)
         pprint()
 
         lion = Lion(sex=Sex.MALE, id_number=6, animal_cannot_move=True)
         self.assertEqual(lion.info(), "L-6(mal,5,4)")
         self.assertEqual(lion.get_class_name(), "L-")
         self.assertEqual(lion.get_max_food_points(), 5)
-        self.assertEqual(lion._Lion__cell_speed, 3)
-        self.assertEqual(lion._Lion__animal_cannot_move, True)
+        self.assertEqual(lion._Animal__cell_speed, 3)
+        self.assertEqual(lion._Animal__animal_cannot_move, True)
         pprint()
 
         gratulations_message("herbivore and predator classes")
@@ -112,7 +103,7 @@ class Test(unittest.TestCase):
         self.assertTrue(cell.is_animal_with_another_sex(Zebra(Sex.MALE)))
         self.assertFalse(cell.is_animal_with_another_sex(Tiger(Sex.MALE)))
         self.assertTrue(cell.find_herbivore())
-        self.assertListEqual([cell.get_column_index(), cell.get_raw_index()],
+        self.assertListEqual([cell.get_column_index(), cell.get_row_index()],
                              [3, 2]
         )
         pprint()
@@ -141,7 +132,7 @@ class Test(unittest.TestCase):
         gratulations_message("cell class")
 
     def tests_for_area_class_1(self):
-        print(Fore.WHITE + "Area class testing ")
+        print(Fore.WHITE + "Area class testing", end='', flush=True)
         cell1 = Cell(0, 0, Plant(), [   ### id for animals will be set auto
             Zebra(Sex.MALE),
             Lion(Sex.FEMALE)
@@ -159,14 +150,21 @@ class Test(unittest.TestCase):
         area = Area(area=[[cell1, cell2], [cell3, cell4]])
         self.assertEqual(area.get_length(), 2)
         self.assertEqual(area.get_width(), 2)
-        print(area.transform_area_into_matrix_form())
+        self.assertSetEqual(set(area._Area__get_neighbor_cells(cell1, 1)), {cell2, cell3, cell4})
+        pprint()
+        self.assertSetEqual(set(area._Area__get_neighbor_cells(cell2, 2)), {cell1, cell3, cell4})
+        self.assertSetEqual(set(area._Area__get_neighbor_cells(cell3, 3)), {cell1, cell2, cell4})
+        pprint()
         area.next_step()
+        
+
+
 
 if __name__ == '__main__':
     test = Test()
-    test.tests_for_animal_class()
-    test.tests_for_herbivore_and_predator_classes()
-    test.cell_tests()
+    #test.tests_for_animal_class()
+    #test.tests_for_herbivore_and_predator_classes()
+    #test.cell_tests()
     test.tests_for_area_class_1()
     
 

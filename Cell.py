@@ -39,7 +39,7 @@ class Cell():
     def get_column_index(self) -> int:
         return self.__column_index
 
-    def get_raw_index(self) -> int:
+    def get_row_index(self) -> int:
         return self.__raw_index
 
     def get_plant_on_cell(self) -> Plant:

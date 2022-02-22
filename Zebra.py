@@ -4,17 +4,16 @@ from Sex import Sex
 from Herbivore import Herbivore
 
 class Zebra(Herbivore): #herbivore inheritance
-    def __init__(self, sex_ : Sex, id_number = -1, animal_cannot_move = False) -> None:
-        super().__init__(4, 4)
-        self.__animal_sex = sex_
-        self.__cell_speed = 2
-        self.__animal_cannot_move = animal_cannot_move
-        self.__animal_id = id_number
-        self.__max_food_points = 4
+    def __init__(self, sex : Sex, id_number : int = -1, animal_cannot_move : bool = False) -> None:
+        super().__init__(
+            food_points=4, life_points=4, cell_speed=2,
+            animal_id=id_number, animal_cannot_move=animal_cannot_move,
+            sex=sex, max_food_points=4
+        )
 
     def info(self) -> String:
-        result_string = 'Z-' + str(self.__animal_id) + '('
-        result_string = result_string + 'fem,' if self.__animal_sex == Sex.FEMALE \
+        result_string = 'Z-' + str(self._Animal__animal_id) + '('
+        result_string = result_string + 'fem,' if self._Animal__animal_sex == Sex.FEMALE \
             else result_string + 'mal,'
         result_string += str(self._Animal__food_points) + ',' +\
                      str(self._Animal__life_points) + ')' 
@@ -23,6 +22,4 @@ class Zebra(Herbivore): #herbivore inheritance
     @staticmethod
     def get_class_name() -> String:
         return 'Z-'
-    
-    def get_max_food_points(self):
-        return self.__max_food_points
+        
