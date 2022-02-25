@@ -20,6 +20,3 @@ class Lion(Predator):
 
     def get_class_name(self) -> str:
         return 'L-'
-
-lion = Lion(Sex.MALE)
-print(lion.get_animal_class_name())

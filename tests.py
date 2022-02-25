@@ -3,9 +3,6 @@ import unittest
 import time
 import random
 from colorama import Fore
-import numpy as np
-
-from sqlalchemy import true
 
 from Animal import Animal
 from Zebra import Zebra
@@ -140,6 +137,8 @@ class Test(unittest.TestCase):
             Rabbit(Sex.FEMALE)
         ])
         cell3 = Cell(1, 0, animals=[
+            Lion(Sex.MALE),
+            Lion(Sex.FEMALE)
         ])
         cell4 = Cell(1, 1)  ### empty cell
         area = Area(area=[[cell1, cell2], [cell3, cell4]])
@@ -156,12 +155,12 @@ class Test(unittest.TestCase):
             area.next_step()
             a = int(input())
 
+        print()
+
         
         
 
 
-
-if __name__ == '__main__':
     test = Test()
     #test.tests_for_animal_class()
     #test.tests_for_herbivore_and_predator_classes()

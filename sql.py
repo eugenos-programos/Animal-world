@@ -1,8 +1,4 @@
-from multiprocessing import connection
 import sqlite3
-
-connection = sqlite3.connect('data.db')
-crsr = connection.cursor()
 
 sql_command_create = """
 
@@ -53,9 +49,11 @@ def get_data() -> list[tuple]:
     return ans
 
 #crsr.execute(sql_command_insert)
-
-
-
-
-connection.commit()
-connection.close()
+def save_data(inh_types : list, row_indices : list, column_indices : list, sex : list) -> None:
+    connection = sqlite3.connect('data.db')
+    crsr = connection.cursor()
+    crsr.execute("DELETE * FROM animals")
+    for index in range(len(inh_types)):
+        crsr.execute(f"INSERT INTO animals VALUES ({inh_types[index]}, {row_indices[index], {column_indices[index]}, {sex[index]}})")
+    connection.commit()
+    connection.close()
