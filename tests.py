@@ -134,17 +134,12 @@ class Test(unittest.TestCase):
     def tests_for_area_class_1(self):
         print(Fore.WHITE + "Area class testing", end='', flush=True)
         cell1 = Cell(0, 0, Plant(), [   ### id for animals will be set auto
-            Zebra(Sex.MALE),
-            Lion(Sex.FEMALE)
         ])
         cell2 = Cell(0, 1, animals=[
             Rabbit(Sex.MALE),
-            Lion(Sex.FEMALE),
             Rabbit(Sex.FEMALE)
         ])
         cell3 = Cell(1, 0, animals=[
-            Lion(Sex.FEMALE),
-            Rabbit(Sex.MALE)
         ])
         cell4 = Cell(1, 1)  ### empty cell
         area = Area(area=[[cell1, cell2], [cell3, cell4]])
@@ -155,7 +150,13 @@ class Test(unittest.TestCase):
         self.assertSetEqual(set(area._Area__get_neighbor_cells(cell2, 2)), {cell1, cell3, cell4})
         self.assertSetEqual(set(area._Area__get_neighbor_cells(cell3, 3)), {cell1, cell2, cell4})
         pprint()
-        area.next_step()
+        print()
+        a = 1
+        while(a):
+            area.next_step()
+            a = int(input())
+
+        
         
 
 
@@ -166,7 +167,6 @@ if __name__ == '__main__':
     #test.tests_for_herbivore_and_predator_classes()
     #test.cell_tests()
     test.tests_for_area_class_1()
-    
 
 
 

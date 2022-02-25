@@ -17,17 +17,18 @@ class Cell():
         self.__animals = animals
     
     def add_animal_on_cell(self, animal : Animal) -> bool:
-        cannot_add = (len(self.__animals) == 3 and self.get_plant_on_cell()) \
-                                            or len(self.__animals) == 4
-        if not cannot_add:
+        can_add = not ((len(self.__animals) == 3 and self.get_plant_on_cell()) \
+                                            or len(self.__animals) == 4)
+        if can_add:
             self.__animals.append(animal)
-        return cannot_add
+        return can_add
 
     def is_animal_with_another_sex(self, animal : Animal) -> Animal:
         animal_type = type(animal)
-        for animal in self.__animals:
-            if isinstance(animal, animal_type):
-                return animal
+        for animal_in_cell in self.__animals:
+            if type(animal_in_cell) == animal_type and \
+                animal_in_cell.get_animal_sex() != animal.get_animal_sex():
+                return animal_in_cell
         return None
     
     def find_herbivore(self) -> Animal:
@@ -79,9 +80,10 @@ class Cell():
         for animal in animals_will_die_in_next_step:
             self.delete_animal(animal)
 
-    def add_plant_in_cell(self, plant_id=-1) -> None:
+    def add_plant_in_cell(self, plant_id) -> None:
         if len(self.__animals) == 4 or self.__plant:
             raise 'There is no place for plant in cell'
+        self.__plant = Plant(plant_id, True)
 
     def inhabitant_numb(self) -> int:
         is_plant_on_cell = int(self.__plant is not None)

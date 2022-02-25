@@ -26,7 +26,7 @@ class Plant():
         info_string = 'P-' + str(self.__id) + '(' + str(self.__life_points) + ')'
         return info_string
     
-    def it_is_new_plant(self, parameter : bool) -> bool:
+    def it_is_new_plant(self) -> bool:
         return self.__new_plant
 
     def is_new_plant(self, parameter : bool) -> None:
