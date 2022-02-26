@@ -1,15 +1,12 @@
 from pkgutil import get_data
+from shutil import move
 from typing import List
+
+from sklearn.neighbors import VALID_METRICS
 from Sex import Sex
-from Zebra import Zebra
-from Rabbit import Rabbit
-from Lion import Lion
-from Tiger import Tiger
 from Cell import Cell
 from Animal import Animal
 from Plant import Plant
-from Herbivore import Herbivore
-from Predator import Predator
 from sql import *
 import os
 import random
@@ -27,16 +24,18 @@ class Area():
         for cell_raw in self.__area:
             for cell in cell_raw:
                 for animal_in_cell in cell.get_animals_in_cell():
-                    if animal_in_cell.get_cannot_animal_move(): continue
-                    if animal_in_cell.get_life_points() == 1:
+                    move_choise = animal_in_cell.move_choise()
+                    if move_choise == "Cannot move": continue
+                    if move_choise == "Will die":
                         if not self.__find_partner(cell, animal_in_cell):
                             self.__find_eat(cell, animal_in_cell)
-                    if animal_in_cell.get_food_points() == 2:
+                    if move_choise == "Find eat":
                         self.__find_eat(cell, animal_in_cell)
-                    if animal_in_cell.get_food_points() >= 3:
+                    if move_choise == "Find partner":
                         if not self.__find_partner(cell, animal_in_cell):
                             ### move to random cell if animal was not found partner and has max food_points
-                            if animal_in_cell.get_food_points() == animal_in_cell.get_max_food_points():
+                            if animal_in_cell.get_food_points(
+                            ) == animal_in_cell.get_max_food_points():
                                 random_neighbor_cell = Area.__get_random_neighbor_cell(
                                     self.__get_neighbor_cells(
                                         cell, animal_in_cell.get_cell_speed()))
@@ -54,15 +53,19 @@ class Area():
         if cell_with_herbivore.get_plant_on_cell():
             self.__eat_plant(animal, cell_with_herbivore, cell_with_herbivore)
             return
-        neighbor_cells = self.__get_neighbor_cells(cell_with_herbivore, animal.get_cell_speed()) 
+        neighbor_cells = self.__get_neighbor_cells(cell_with_herbivore,
+                                                   animal.get_cell_speed())
         for neighbor_cell in neighbor_cells:
-            if neighbor_cell.get_plant_on_cell() and neighbor_cell.inhabitant_numb() < 4:
-                self.__move_animal_between_cells(cell_with_herbivore, neighbor_cell, animal)
+            if neighbor_cell.get_plant_on_cell(
+            ) and neighbor_cell.inhabitant_numb() < 4:
+                self.__move_animal_between_cells(cell_with_herbivore,
+                                                 neighbor_cell, animal)
                 self.__eat_plant(animal, cell_with_herbivore, neighbor_cell)
                 return
         ### if can not find food animal goes to the rand neighbor cell
         for neighbor_cell in neighbor_cells:
-            if self.__move_animal_between_cells(cell_with_herbivore, neighbor_cell, animal):
+            if self.__move_animal_between_cells(cell_with_herbivore,
+                                                neighbor_cell, animal):
                 animal.set_cannot_animal_move(True)
                 return
 
@@ -73,13 +76,15 @@ class Area():
                                  cell_with_predator,
                                  cell_with_predator.find_herbivore())
             return
-        neighbor_cells = self.__get_neighbor_cells(cell_with_predator, animal.get_cell_speed())
+        neighbor_cells = self.__get_neighbor_cells(cell_with_predator,
+                                                   animal.get_cell_speed())
         for neighbor_cell in neighbor_cells:
-            if neighbor_cell.find_herbivore() and neighbor_cell.inhabitant_numb() < 4:
+            if neighbor_cell.find_herbivore(
+            ) and neighbor_cell.inhabitant_numb() < 4:
                 animal.set_cannot_animal_move(True)
-                self.__move_animal_between_cells(cell_with_predator, neighbor_cell, animal)
-                self.__eat_herbivore(animal, cell_with_predator,
-                                     neighbor_cell,
+                self.__move_animal_between_cells(cell_with_predator,
+                                                 neighbor_cell, animal)
+                self.__eat_herbivore(animal, cell_with_predator, neighbor_cell,
                                      neighbor_cell.find_herbivore())
                 return
         for neighbor_cell in neighbor_cells:
@@ -89,27 +94,29 @@ class Area():
                 return
 
     def __find_eat(self, cell_with_animal: Cell, animal: Animal) -> None:
-        if (animal.get_animal_class_name() == 'Herbivore'):
+        if (animal.get_animal_type() in ['R-', 'Z-']):
             self.__find_eat_for_herbivore(cell_with_animal, animal)
-        elif (animal.get_animal_class_name() == 'Predator'):
+        else:
             self.__find_eat_for_predator(cell_with_animal, animal)
 
     def __find_partner(self, cell_with_animal: Cell, animal: Animal) -> bool:
-        neighbor_cells = self.__get_neighbor_cells(cell_with_animal, animal.get_cell_speed()) + [cell_with_animal]
+        neighbor_cells = self.__get_neighbor_cells(
+            cell_with_animal, animal.get_cell_speed()) + [cell_with_animal]
         for neighbor_cell in neighbor_cells:
-                if neighbor_cell.is_animal_with_another_sex(animal) and neighbor_cell.inhabitant_numb() <= 2:
-                    partner_animal = neighbor_cell.is_animal_with_another_sex(
-                        animal)
-                    if not neighbor_cell == cell_with_animal:
-                        self.__move_animal_between_cells(
-                            cell_with_animal, neighbor_cell, animal)
-                    self.__propagate_the_animals(neighbor_cell, animal,
-                                                 partner_animal)
-                    self.__inhabitant_log += f'{animal.get_class_name()}{animal.get_animal_id()}' + \
-                                            '+' + f'{partner_animal.get_class_name()}{partner_animal.get_animal_id()}=' +\
-                                                 f'{animal.get_class_name()}{self.__last_inhabitant_id}|'
-                                                
-                    return True
+            if neighbor_cell.is_animal_with_another_sex(
+                    animal) and neighbor_cell.inhabitant_numb() <= 2:
+                partner_animal = neighbor_cell.is_animal_with_another_sex(
+                    animal)
+                if not neighbor_cell == cell_with_animal:
+                    self.__move_animal_between_cells(cell_with_animal,
+                                                     neighbor_cell, animal)
+                self.__propagate_the_animals(neighbor_cell, animal,
+                                             partner_animal)
+                self.__inhabitant_log += f'{animal.get_animal_type()}{animal.get_animal_id()}' + \
+                                        '+' + f'{partner_animal.get_animal_type()}{partner_animal.get_animal_id()}=' +\
+                                             f'{animal.get_animal_type()}{self.__last_inhabitant_id}|'
+
+                return True
         return False
 
     def __get_neighbor_cells(self, cell: Cell, scope_level: int) -> list[Cell]:
@@ -156,7 +163,7 @@ class Area():
             return True
         if not second_cell.add_animal_on_cell(animal):
             return False
-        self.__inhabitant_log += animal.get_class_name() +\
+        self.__inhabitant_log += animal.get_animal_type() +\
                             f'{animal.get_animal_id()}->[{second_cell.get_row_index()},' +\
                             f'{second_cell.get_column_index()}] |'
         first_cell.delete_animal(animal)
@@ -175,7 +182,8 @@ class Area():
                     4)  # 4 change on name later
                 self.__inhabitant_log += f'P-{cell_with_plant.get_plant_on_cell().get_plant_id()}+->P-' +\
                                         f'{neighbor_cell.get_plant_on_cell().get_plant_id()}|'
-            elif neighbor_cell.inhabitant_numb() < 4 and not neighbor_cell.get_plant_on_cell():
+            elif neighbor_cell.inhabitant_numb(
+            ) < 4 and not neighbor_cell.get_plant_on_cell():
                 self.__last_inhabitant_id += 1
                 neighbor_cell.add_plant_in_cell(self.__last_inhabitant_id)
                 self.__inhabitant_log += f"P-{cell_with_plant.get_plant_on_cell().get_plant_id()}*->P-" + \
@@ -185,30 +193,12 @@ class Area():
     def __propagate_the_animals(self, cell_with_animals: Cell,
                                 first_animal: Animal,
                                 second_animal: Animal) -> None:
-
-        if (first_animal.get_class_name() == "R-"):
-            self.__increase_last_inhabitant_id()
-            new_rabbit = Rabbit(self.generate_animal_sex(),
+        first_animal_type = first_animal.get_animal_type()
+        self.__increase_last_inhabitant_id()
+        print(self.__last_inhabitant_id)
+        new_animal = Animal(first_animal_type, self.generate_animal_sex(),
                                 self.__last_inhabitant_id, True)
-            cell_with_animals.add_animal_on_cell(new_rabbit)
-
-        elif (first_animal.get_class_name() == "Z-"):
-            self.__increase_last_inhabitant_id()
-            new_zebra = Zebra(self.generate_animal_sex(),
-                              self.__last_inhabitant_id, True)
-            cell_with_animals.add_animal_on_cell(new_zebra)
-
-        elif (first_animal.get_class_name() == "T-"):
-            self.__increase_last_inhabitant_id()
-            new_tiger = Tiger(self.generate_animal_sex(),
-                              self.__last_inhabitant_id, True)
-            cell_with_animals.add_animal_on_cell(new_tiger)
-
-        elif (first_animal.get_class_name() == "L-"):
-            self.__increase_last_inhabitant_id()
-            new_lion = Lion(self.generate_animal_sex(),
-                            self.__last_inhabitant_id, True)
-            cell_with_animals.add_animal_on_cell(new_lion)
+        cell_with_animals.add_animal_on_cell(new_animal)
         first_animal.set_cannot_animal_move(True)
         second_animal.set_cannot_animal_move(True)
 
@@ -247,13 +237,13 @@ class Area():
             cell_with_plant.get_plant_on_cell().set_life_points(plant_lpoints -
                                                                 max_fpoints +
                                                                 fpoints)
-            self.__inhabitant_log += animal.get_class_name() +\
+            self.__inhabitant_log += animal.get_animal_type() +\
                  f'{animal.get_animal_id()} eatten some P- {cell_with_plant.get_plant_on_cell().get_plant_id()}|'
             return
         ### if plant won't survive :(
         else:
             animal.set_food_points(fpoints + plant_lpoints)
-            self.__inhabitant_log += animal.get_class_name()  +\
+            self.__inhabitant_log += animal.get_animal_type()  +\
                 f'{animal.get_animal_id()} eatten all P-{cell_with_plant.get_plant_on_cell().get_plant_id()}|'
             cell_with_plant.get_plant_on_cell().set_life_points(0)
 
@@ -261,18 +251,22 @@ class Area():
                         cell_with_herbivore: Cell, herbivore: Animal) -> None:
         if animal.get_cell_speed() <= herbivore.get_cell_speed() and not herbivore.get_cannot_animal_move() \
             and random.randint(0, 1) == 1:
-            self.__inhabitant_log += animal.get_class_name() +\
-                                     f'{animal.get_animal_id()} dsnt catch ' + herbivore.get_class_name() +\
+            self.__inhabitant_log += animal.get_animal_type() +\
+                                     f'{animal.get_animal_id()} dsnt catch ' + herbivore.get_animal_type() +\
                                          f'{herbivore.get_animal_id()}|'
-            self.__move_animal_between_cells(cell_with_herbivore, self.__get_random_neighbor_cell(self.__get_neighbor_cells(cell_with_herbivore, 1)), herbivore)
+            self.__move_animal_between_cells(
+                cell_with_herbivore,
+                self.__get_random_neighbor_cell(
+                    self.__get_neighbor_cells(cell_with_herbivore, 1)),
+                herbivore)
             herbivore.set_cannot_animal_move(True)
             return
         max_fpoints = animal.get_max_food_points()
         fpoints = animal.get_food_points()
         hlpoints = herbivore.get_life_points()
-        animal.set_food_points(fpoints + hlpoints )
-        self.__inhabitant_log += animal.get_class_name() + f'{animal.get_animal_id()} eat ' + \
-                                        herbivore.get_class_name() + f'{herbivore.get_animal_id()}|'
+        animal.set_food_points(fpoints + hlpoints)
+        self.__inhabitant_log += animal.get_animal_type() + f'{animal.get_animal_id()} eat ' + \
+                                        herbivore.get_animal_type() + f'{herbivore.get_animal_id()}|'
         cell_with_herbivore.delete_animal(herbivore)
         if animal.get_food_points() > max_fpoints:
             animal.set_food_points(max_fpoints)
@@ -353,54 +347,67 @@ class Area():
             key = int(input("Key value:"))
             if key == 1:
                 self.next_step()
-            if key == 2:
-                    self.create_new_plant()
-            if key == 3:
-                    self.create_new_animal()
-            if key == 4:
-                    self.save_area()
-            if key == 5:
-                    exit()
+            elif key == 2:
+                self.create_new_plant()
+            elif key == 3:
+                self.create_new_animal()
+            elif key == 4:
+                self.save_area()
+            elif key == 5:
+                exit()
+            else:
+                print("Uncorrect key value. Try again.")
+
 
     def create_new_plant(self):
-        row_index = int(input("Row index:"))
-        column_index = int(input("Column index"))
-        if self.__length <= row_index or self.__width <= column_index:
-            raise "Uncorrect row or column index value"
-        cell = self.__area[row_index][column_index]
-        if cell.get_plant_on_cell() is not None:
-            raise "Plant already exist on this cell"
+        try:
+            row_index = int(input("Row index:"))
+            column_index = int(input("Column index:"))
+        except Exception as e:
+            print("Uncorrect row or column index type. Try again!")
+            return
+        try:
+            if self.__length <= row_index or self.__width <= column_index:
+                raise ValueError("Uncorrect row or column index value")
+            cell = self.__area[row_index][column_index]
+            if cell.get_plant_on_cell() is not None:
+                raise ValueError("Plant already exist on this cell")
+        except Exception as e:
+            print(e)
+            return
         self.__increase_last_inhabitant_id()
         cell.add_plant_in_cell(self.__last_inhabitant_id)
         print("Plant added to the cell!")
         self.display_area()
-    
+
     def create_new_animal(self):
-        animal_type = input("Animal type: Z/R/L/T/")
-        row_index = int(input("Row index"))
-        column_index = int(input("Column index"))
-        sex = input("Animal sex: female/male")
-        if sex == 'female':
-            sex = Sex.FEMALE
-        elif sex == 'male':
-            sex = Sex.MALE
-        else:
-            raise "Uncorrect sex input"            
-        if self.__length <= row_index or self.__width <= column_index:
-            raise "Uncorrect row or column index value"
-        cell = self.__area[row_index][column_index]
-        if cell.inhabitant_numb == 4:
-            raise "Cannot add animal to the cell"
-        if animal_type == 'Z':
-            animal = Zebra(sex, self.__last_inhabitant_id + 1)
-        elif animal_type == 'R':
-            animal = Rabbit(sex, self.__last_inhabitant_id + 1)
-        elif animal_type == 'L':
-            animal = Lion(sex, self.__last_inhabitant_id + 1)
-        elif animal_type == 'T':
-            animal = Tiger(sex, self.__last_inhabitant_id + 1)
-        else:
-            raise "Incorrect animal type"
+        try:
+            row_index = int(input("Row index:"))
+            column_index = int(input("Column index:"))
+            if self.__length <= row_index or self.__width <= column_index:
+                raise ValueError("Row or column index is out of bounds!")
+        except Exception as e:
+            print(e)
+            return
+        try:
+            animal_type = input('Animal type : Z/R/L/T:')
+            if animal_type not in ['Z', 'R', 'L', 'T']:
+                raise ValueError("Uncorrect animal type. Try again!")
+            sex = input("Animal sex: female/male:")
+            if sex == 'female':
+                sex = Sex.FEMALE
+            elif sex == 'male':
+                sex = Sex.MALE
+            else:
+                raise ValueError("Uncorrect sex input")
+            cell = self.__area[row_index][column_index]
+            if cell.inhabitant_numb == 4:
+                raise ValueError("Cannot add animal to the cell")
+        except Exception as e:
+            print(e)
+            return
+        animal = Animal(animal_type + '-', sex, self.__last_inhabitant_id + 1)
+        self.__last_inhabitant_id += 1
         cell.add_animal_on_cell(animal)
         print("Animal added to the cell")
         self.display_area()
@@ -420,7 +427,7 @@ class Area():
                     column_indices.append(column_index)
                     sex.append('none')
                 for animal in cell.get_animals_in_cell():
-                    animal_types.append(type(animal).__name__)
+                    animal_types.append(animal.get_animal_type())
                     row_indices.append(row_index)
                     column_indices.append(column_index)
                     animal_sex = animal.get_animal_sex()
@@ -437,9 +444,8 @@ class Area():
             res_sex = Sex.MALE
         return res_sex
 
-
     @staticmethod
-    def transform_df_into_inh_list(df : pd.DataFrame) -> List[object]:
+    def transform_df_into_inh_list(df: pd.DataFrame) -> List[object]:
         output = []
         is_plant = False
         for ind, row in df.iterrows():
@@ -447,37 +453,37 @@ class Area():
             animal_sex = Sex.MALE if row.Sex == 'male' else Sex.FEMALE
             if type == 'Plant':
                 is_plant = True
-            if type == 'Rabbit':
-                output.append(Rabbit(animal_sex))
-            elif type == 'Zebra':
-                output.append(Zebra(animal_sex))
-            elif type == 'Tiger':
-                output.append(Tiger(animal_sex))
-            elif type == 'Lion':
-                output.append(Lion(animal_sex))
+            else:
+                type = type[0] + '-'
+                animal = Animal(type, animal_sex)
+                output.append(animal)
         plant = Plant() if is_plant else None
         return output, plant
 
-def create_area_from_database(start_data=False) -> object:    
+
+def create_area_from_database(start_data=False) -> object:
     length = 3
     width = 7
     all_cells = []
     data = get_data() if not start_data else get_start_data()
     cell_inh_data = pd.DataFrame(
-            data=data,
-            columns=[
-                'id', 'Animal_type', 'Cell_row_index', 'Cell_column_index', 'Sex'
-            ],
-        ).set_index(keys='id')
+        data=data,
+        columns=[
+            'id', 'Animal_type', 'Cell_row_index', 'Cell_column_index', 'Sex'
+        ],
+    ).set_index(keys='id')
     length = cell_inh_data.Cell_row_index.max() + 1
     width = cell_inh_data.Cell_column_index.max() + 1
     for row_index in range(length):
         cell_row = []
         for column_index in range(width):
-            selected_inh_data = cell_inh_data.query("Cell_row_index == @row_index & Cell_column_index == @column_index")
-            inhabitant_list, plant = Area.transform_df_into_inh_list(selected_inh_data)
-            cell_row.append(Cell(row_index, column_index, plant, inhabitant_list))
+            selected_inh_data = cell_inh_data.query(
+                "Cell_row_index == @row_index & Cell_column_index == @column_index"
+            )
+            inhabitant_list, plant = Area.transform_df_into_inh_list(
+                selected_inh_data)
+            cell_row.append(
+                Cell(row_index, column_index, plant, inhabitant_list))
         all_cells.append(cell_row)
     return Area(all_cells)
-
 

@@ -1,42 +1,46 @@
 from Animal import Animal
 from Plant import Plant
 
-class Cell():
-    __column_index : int
-    __raw_index : int
-    __plant : Plant
-    __animals : list[Animal]
 
-    def __init__(self, raw_index : int, column_index : int,
-                plant_on_cell : Plant = None, animals : list[Animal] = []) -> None:
+class Cell():
+    __column_index: int
+    __raw_index: int
+    __plant: Plant
+    __animals: list[Animal]
+
+    def __init__(self,
+                 raw_index: int,
+                 column_index: int,
+                 plant_on_cell: Plant = None,
+                 animals: list[Animal] = []) -> None:
         if len(animals) > 4 or len(animals) == 4 and Plant:
             raise "check input"
         self.__column_index = column_index
         self.__raw_index = raw_index
         self.__plant = plant_on_cell
         self.__animals = animals
-    
-    def add_animal_on_cell(self, animal : Animal) -> bool:
+
+    def add_animal_on_cell(self, animal: Animal) -> bool:
         can_add = not ((len(self.__animals) == 3 and self.get_plant_on_cell()) \
                                             or len(self.__animals) == 4)
         if can_add:
             self.__animals.append(animal)
         return can_add
 
-    def is_animal_with_another_sex(self, animal : Animal) -> Animal:
-        animal_type = type(animal)
+    def is_animal_with_another_sex(self, animal: Animal) -> Animal:
+        animal_type = animal.get_animal_type()
         for animal_in_cell in self.__animals:
-            if type(animal_in_cell) == animal_type and \
+            if animal_in_cell.get_animal_type() == animal_type and \
                 animal_in_cell.get_animal_sex() != animal.get_animal_sex():
                 return animal_in_cell
         return None
-    
+
     def find_herbivore(self) -> Animal:
         for animal in self.__animals:
-            if animal.get_animal_class_name() == 'Herbivore':
+            if animal.get_animal_type() in ['R-', 'Z-']:
                 return animal
         return None
-    
+
     def get_column_index(self) -> int:
         return self.__column_index
 
@@ -45,20 +49,17 @@ class Cell():
 
     def get_plant_on_cell(self) -> Plant:
         return self.__plant
-    
-    def delete_animal(self, animal : Animal) -> None:
-        #if animal not in self.__animals:
-        #    print(animal.info())
-        #    raise f"Animal {animal.info()} does not axist in this cell"
+
+    def delete_animal(self, animal: Animal) -> None:
         if animal in self.__animals:
             self.__animals.remove(animal)
-        
+
     def info(self) -> list[str]:
         str_empty_place = "      -       "
         string_describing_cell = []
         if self.get_plant_on_cell():
             string_describing_cell.append(self.__plant.info() + '      ')
-        for animal in self.__animals:   
+        for animal in self.__animals:
             string_describing_cell.append(animal.info())
         string_describing_cell += [
             str_empty_place for index in range(4 - len(string_describing_cell))
@@ -72,12 +73,12 @@ class Cell():
         if not self.__plant:
             raise 'Plant does not exist in this cell'
         self.__plant = None
-    
+
     def next_step(self) -> None:
         if self.__plant and not self.__plant.next_step():
             self.delete_plant_on_cell()
         animals_will_die_in_next_step = [
-            animal for animal in self.__animals if not animal.next_step() 
+            animal for animal in self.__animals if not animal.next_step()
         ]
         for animal in animals_will_die_in_next_step:
             self.delete_animal(animal)
@@ -90,5 +91,3 @@ class Cell():
     def inhabitant_numb(self) -> int:
         is_plant_on_cell = int(self.__plant is not None)
         return is_plant_on_cell + len(self.__animals)
-
-

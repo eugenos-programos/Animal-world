@@ -39,6 +39,8 @@ VALUES
 ('Plant',0,5,'none');
 
 """
+
+
 def get_start_data() -> list[tuple]:
     connection = sqlite3.connect('data.db')
     crsr = connection.cursor()
@@ -48,6 +50,7 @@ def get_start_data() -> list[tuple]:
     ans = crsr.fetchall()
     return ans
 
+
 def get_data() -> list[tuple]:
     connection = sqlite3.connect('data.db')
     crsr = connection.cursor()
@@ -55,13 +58,17 @@ def get_data() -> list[tuple]:
     ans = crsr.fetchall()
     return ans
 
+
 #crsr.execute(sql_command_insert)
-def save_data(inh_types : list, row_indices : list, column_indices : list, sex : list) -> None:
+def save_data(inh_types: list, row_indices: list, column_indices: list,
+              sex: list) -> None:
     connection = sqlite3.connect('data.db')
     crsr = connection.cursor()
     crsr.execute("DELETE FROM animals WHERE row_index >= 0;")
     for index in range(len(inh_types)):
-        crsr.execute(f"INSERT INTO animals(name, row_index, column_index, sex) VALUES ('{inh_types[index]}', '{row_indices[index]}', '{column_indices[index]}', '{sex[index]}');")
+        crsr.execute(
+            f"INSERT INTO animals(name, row_index, column_index, sex) VALUES ('{inh_types[index]}', '{row_indices[index]}', '{column_indices[index]}', '{sex[index]}');"
+        )
     connection.commit()
     connection.close()
     exit()
