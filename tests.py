@@ -149,22 +149,17 @@ class Test(unittest.TestCase):
         self.assertSetEqual(set(area._Area__get_neighbor_cells(cell2, 2)), {cell1, cell3, cell4})
         self.assertSetEqual(set(area._Area__get_neighbor_cells(cell3, 3)), {cell1, cell2, cell4})
         pprint()
-        print()
-        a = 1
-        while(a):
-            area.next_step()
-            a = int(input())
-
-        print()
-
+        gratulations_message("Area class")
         
         
 
 
+
+if __name__ == '__main__':
     test = Test()
-    #test.tests_for_animal_class()
-    #test.tests_for_herbivore_and_predator_classes()
-    #test.cell_tests()
+    test.tests_for_animal_class()
+    test.tests_for_herbivore_and_predator_classes()
+    test.cell_tests()
     test.tests_for_area_class_1()
 
 

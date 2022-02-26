@@ -47,9 +47,11 @@ class Cell():
         return self.__plant
     
     def delete_animal(self, animal : Animal) -> None:
-        if animal not in self.__animals:
-            raise f"Animal {animal.info()} does not axist in this cell"
-        self.__animals.remove(animal)
+        #if animal not in self.__animals:
+        #    print(animal.info())
+        #    raise f"Animal {animal.info()} does not axist in this cell"
+        if animal in self.__animals:
+            self.__animals.remove(animal)
         
     def info(self) -> list[str]:
         str_empty_place = "      -       "

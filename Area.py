@@ -1,8 +1,5 @@
-from nis import match
+from pkgutil import get_data
 from typing import List
-from black import out
-from pyparsing import col
-from sqlalchemy import case
 from Sex import Sex
 from Zebra import Zebra
 from Rabbit import Rabbit
@@ -67,7 +64,7 @@ class Area():
         for neighbor_cell in neighbor_cells:
             if self.__move_animal_between_cells(cell_with_herbivore, neighbor_cell, animal):
                 animal.set_cannot_animal_move(True)
-        return
+                return
 
     def __find_eat_for_predator(self, cell_with_predator: Cell,
                                 animal: Animal) -> None:
@@ -89,7 +86,7 @@ class Area():
             if self.__move_animal_between_cells(cell_with_predator,
                                                 neighbor_cell, animal):
                 animal.set_cannot_animal_move(True)
-            return
+                return
 
     def __find_eat(self, cell_with_animal: Cell, animal: Animal) -> None:
         if (animal.get_animal_class_name() == 'Herbivore'):
@@ -267,11 +264,7 @@ class Area():
             self.__inhabitant_log += animal.get_class_name() +\
                                      f'{animal.get_animal_id()} dsnt catch ' + herbivore.get_class_name() +\
                                          f'{herbivore.get_animal_id()}|'
-            self.__move_animal_between_cells(
-                cell_with_herbivore,
-                Area.__get_random_neighbor_cell(
-                    self.__get_neighbor_cells(cell_with_herbivore, 1)),
-                herbivore)
+            self.__move_animal_between_cells(cell_with_herbivore, self.__get_random_neighbor_cell(self.__get_neighbor_cells(cell_with_herbivore, 1)), herbivore)
             herbivore.set_cannot_animal_move(True)
             return
         max_fpoints = animal.get_max_food_points()
@@ -350,7 +343,7 @@ class Area():
     def menu(self):
         key = 1
         while key:
-            print("List of possible choices: \n \
+            print("\n \n List of possible choices: \n \
                 1 - move to the next step.  \
                 2 - create new plant.      \
                 3 - create new annimal. \
@@ -429,10 +422,10 @@ class Area():
                 for animal in cell.get_animals_in_cell():
                     animal_types.append(type(animal).__name__)
                     row_indices.append(row_index)
-                    column_indices.append(column_indices)
-                    sex = animal.get_animal_sex()
-                    sex = 'female' if sex == Sex.FEMALE else 'male'
-                    sex.append(sex)
+                    column_indices.append(column_index)
+                    animal_sex = animal.get_animal_sex()
+                    animal_sex = 'female' if animal_sex == Sex.FEMALE else 'male'
+                    sex.append(animal_sex)
         save_data(animal_types, row_indices, column_indices, sex)
 
     @staticmethod
@@ -465,12 +458,13 @@ class Area():
         plant = Plant() if is_plant else None
         return output, plant
 
-def create_area_from_database() -> object:    
+def create_area_from_database(start_data=False) -> object:    
     length = 3
     width = 7
     all_cells = []
+    data = get_data() if not start_data else get_start_data()
     cell_inh_data = pd.DataFrame(
-            data=get_data(),
+            data=data,
             columns=[
                 'id', 'Animal_type', 'Cell_row_index', 'Cell_column_index', 'Sex'
             ],

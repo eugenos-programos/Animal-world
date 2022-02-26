@@ -8,12 +8,11 @@ CREATE TABLE animals(
     row_index INT,
     column_index INT,
     sex VARCHAR(7)
-)
+);
 
 """
-#crsr.execute(sql_command_create)
 
-sql_command_insert = """
+sql_command_for_start_db = """
 
 INSERT INTO animals (name, row_index, column_index, sex)
 VALUES 
@@ -37,9 +36,17 @@ VALUES
 ('Plant',2,6,'none'),
 ('Plant',2,5,'none'),
 ('Plant',0,6,'none'),
-('Plant',0,5,'none')
+('Plant',0,5,'none');
 
 """
+def get_start_data() -> list[tuple]:
+    connection = sqlite3.connect('data.db')
+    crsr = connection.cursor()
+    crsr.execute("DELETE FROM animals WHERE TRUE")
+    crsr.execute(sql_command_for_start_db)
+    crsr.execute("SELECT * FROM animals")
+    ans = crsr.fetchall()
+    return ans
 
 def get_data() -> list[tuple]:
     connection = sqlite3.connect('data.db')
@@ -52,8 +59,9 @@ def get_data() -> list[tuple]:
 def save_data(inh_types : list, row_indices : list, column_indices : list, sex : list) -> None:
     connection = sqlite3.connect('data.db')
     crsr = connection.cursor()
-    crsr.execute("DELETE * FROM animals")
+    crsr.execute("DELETE FROM animals WHERE row_index >= 0;")
     for index in range(len(inh_types)):
-        crsr.execute(f"INSERT INTO animals VALUES ({inh_types[index]}, {row_indices[index], {column_indices[index]}, {sex[index]}})")
+        crsr.execute(f"INSERT INTO animals(name, row_index, column_index, sex) VALUES ('{inh_types[index]}', '{row_indices[index]}', '{column_indices[index]}', '{sex[index]}');")
     connection.commit()
     connection.close()
+    exit()
